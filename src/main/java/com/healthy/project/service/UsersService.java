@@ -9,10 +9,11 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import org.json.simple.JSONObject;  
+import org.json.simple.JSONObject;
+import org.mindrot.jbcrypt.BCrypt;
+
 import com.healthy.project.model.Users;
 import com.healthy.project.repository.UsersRepository;
-
 
 @Service
 public class UsersService {
@@ -27,6 +28,8 @@ public class UsersService {
 		}
 
 		user.setCreateDate(getDateWithoutTimeUsingFormat());
+		String hashPassword=hashPassword(user.getPassword());
+		user.setPassword(hashPassword);
 		if (userRepository.save(user) != null) {
 			return response = "Success";
 		} else {
@@ -34,36 +37,38 @@ public class UsersService {
 		}
 
 	}
+
 	public List<Users> findUsers(String mobile) {
 
 		return userRepository.findUsers(mobile);
 	}
-	//----------------------------------------------
-	public JSONObject loginUsers (String mobileNumber , String password){
-		List<Users> result = userRepository.loginUsers(mobileNumber, password); 
-		JSONObject obj=new JSONObject(); 
-		if( result.size() >0 ) {
-			
-			Users users=result.get(0);
+
+	// ----------------------------------------------
+	public JSONObject loginUsers(String mobileNumber, String password) {
+		List<Users> result = userRepository.loginUsers(mobileNumber, password);
+		JSONObject obj = new JSONObject();
+		if (result.size() > 0) {
+
+			Users users = result.get(0);
 			obj.put("userId", users.getUserId());
 			obj.put("Name", users.getName());
 			obj.put("Family", users.getFamily());
 			obj.put("Mobile", users.getMobileNumber());
 
-		}else {
+		} else {
 			obj.put("userId", 0);
-			
+
 		}
-		return	obj;
+		return obj;
 	}
-	
+
 	public static Date getDateWithoutTimeUsingFormat() throws ParseException {
 		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
 		return formatter.parse(formatter.format(new Date()));
 	}
 
-	
-
-	
+	private String hashPassword(String plainTextPassword) {
+		return BCrypt.hashpw(plainTextPassword, BCrypt.gensalt());
+	}
 
 }
