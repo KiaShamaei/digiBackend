@@ -19,6 +19,10 @@ import com.healthy.project.repository.UsersRepository;
 public class UsersService {
 	@Autowired
 	UsersRepository userRepository;
+	public List<Users> findUsers(String mobile) {
+
+		return userRepository.findUsers(mobile);
+	}
 
 	public String addUser(Users user) throws ParseException {
 		String response = "";
@@ -38,22 +42,28 @@ public class UsersService {
 
 	}
 
-	public List<Users> findUsers(String mobile) {
-
-		return userRepository.findUsers(mobile);
-	}
+	
 
 	// ----------------------------------------------
 	public JSONObject loginUsers(String mobileNumber, String password) {
-		List<Users> result = userRepository.loginUsers(mobileNumber, password);
+		List<Users> result = userRepository.findUsers(mobileNumber);
 		JSONObject obj = new JSONObject();
 		if (result.size() > 0) {
-
 			Users users = result.get(0);
-			obj.put("userId", users.getUserId());
-			obj.put("Name", users.getName());
-			obj.put("Family", users.getFamily());
-			obj.put("Mobile", users.getMobileNumber());
+			String passwordCheck=checkPassword(password,users.getPassword());
+			if(passwordCheck.equals("true")) {
+				obj.put("userId", users.getUserId());
+				obj.put("Name", users.getName());
+				obj.put("Family", users.getFamily());
+				obj.put("Mobile", users.getMobileNumber());
+			}
+			else
+			{
+				obj.put("userId", -1);
+			}
+			
+			
+			
 
 		} else {
 			obj.put("userId", 0);
@@ -61,14 +71,22 @@ public class UsersService {
 		}
 		return obj;
 	}
-
+//make date parameter 
 	public static Date getDateWithoutTimeUsingFormat() throws ParseException {
 		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
 		return formatter.parse(formatter.format(new Date()));
 	}
-
+//make hashPassword 
 	private String hashPassword(String plainTextPassword) {
 		return BCrypt.hashpw(plainTextPassword, BCrypt.gensalt());
+		
+	}
+//check hash password 
+	private String checkPassword(String plainPassword, String hashedPassword) {
+		if (BCrypt.checkpw(plainPassword, hashedPassword))
+			return "true";
+		else
+			return "false";
 	}
 
 }
