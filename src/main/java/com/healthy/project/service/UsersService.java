@@ -5,15 +5,23 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.stereotype.Service;
 
 import org.json.simple.JSONObject;
 import org.mindrot.jbcrypt.BCrypt;
 
+import com.healthy.project.model.UserInfo;
 import com.healthy.project.model.Users;
 import com.healthy.project.repository.UsersRepository;
+
+
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 
 @Service
 public class UsersService {
@@ -25,8 +33,8 @@ public class UsersService {
 	}
 
 	public String addUser(Users user) throws ParseException {
-		String response = "";
-
+		//return "ddd";
+		String response="";
 		if (findUsers(user.getMobileNumber()).size() > 0) {
 			return response = "mobile number is it!";
 		}
@@ -45,31 +53,43 @@ public class UsersService {
 	
 
 	// ----------------------------------------------
-	public JSONObject loginUsers(String mobileNumber, String password) {
+	public UserInfo loginUsers(String mobileNumber, String password) {
 		List<Users> result = userRepository.findUsers(mobileNumber);
-		JSONObject obj = new JSONObject();
+	String token = "";
+		UserInfo user = new UserInfo();
 		if (result.size() > 0) {
 			Users users = result.get(0);
 			String passwordCheck=checkPassword(password,users.getPassword());
 			if(passwordCheck.equals("true")) {
-				obj.put("userId", users.getUserId());
-				obj.put("Name", users.getName());
-				obj.put("Family", users.getFamily());
-				obj.put("Mobile", users.getMobileNumber());
+				// make token if passwor is correct 
+				 token = getJWTToken(mobileNumber);
+				user.setToken(token);
+				user.setUserInfo(mobileNumber);
+				user.setIsValid(true);
+				return user ;
+				
 			}
 			else
 			{
-				obj.put("userId", -1);
+				//password is invalid .......
+				token = "0";
+				user.setToken(token);
+				user.setUserInfo("password not valid");
+				user.setIsValid(false);
+				return user;
 			}
-			
-			
-			
+		
 
 		} else {
-			obj.put("userId", 0);
+			//username doesnt exist 
+			token = "0";
+			user.setToken(token);
+			user.setUserInfo("username not valid");
+			user.setIsValid(false);
+			return user;
 
 		}
-		return obj;
+		
 	}
 //make date parameter 
 	public static Date getDateWithoutTimeUsingFormat() throws ParseException {
@@ -87,6 +107,27 @@ public class UsersService {
 			return "true";
 		else
 			return "false";
+	}
+//make token for users
+	private String getJWTToken(String username) {
+		String secretKey = "7sheen";
+		List<GrantedAuthority> grantedAuthorities = AuthorityUtils
+				.commaSeparatedStringToAuthorityList("ROLE_USER");
+		
+		String token = Jwts
+				.builder()
+				.setId("softtekJWT")
+				.setSubject(username)
+				.claim("authorities",
+						grantedAuthorities.stream()
+								.map(GrantedAuthority::getAuthority)
+								.collect(Collectors.toList()))
+				.setIssuedAt(new Date(System.currentTimeMillis()))
+				.setExpiration(new Date(System.currentTimeMillis() + 600000))
+				.signWith(SignatureAlgorithm.HS512,
+						secretKey.getBytes()).compact();
+
+		return "Bearer " + token;
 	}
 
 }

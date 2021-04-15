@@ -11,16 +11,17 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.healthy.project.model.UserInfo;
 import com.healthy.project.model.Users;
 import com.healthy.project.service.UsersService;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "http://localhost:3000" )
 public class UsersController {
 @Autowired
 UsersService usersService;
 	
-	
+@CrossOrigin(origins = "http://localhost:3000")	
  @PostMapping("/adduser")
  
  public String addUser (@RequestBody Users user) throws ParseException {
@@ -28,8 +29,13 @@ UsersService usersService;
  }
  @GetMapping("/loginuser")
  
- public JSONObject loginUser (@RequestParam(value="mobileNumber") String mobileNumber,@RequestParam(value="password") String password )  {
+ public UserInfo loginUser (@RequestParam(value="mobileNumber") String mobileNumber,@RequestParam(value="password") String password )  {
 	 return usersService.loginUsers(mobileNumber, password);
+ }
+ @CrossOrigin(origins = "http://localhost:3000")
+ @PostMapping("userinfo")
+ public Users getUsers (@RequestBody UserInfo userInfo) {
+	 return usersService.findUsers(userInfo.getUserInfo()).get(0);
  }
 
 }
