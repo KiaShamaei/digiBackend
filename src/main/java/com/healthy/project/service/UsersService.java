@@ -33,7 +33,6 @@ public class UsersService {
 	}
 
 	public String addUser(Users user) throws ParseException {
-		//return "ddd";
 		String response="";
 		if (findUsers(user.getMobileNumber()).size() > 0) {
 			return response = "mobile number is it!";
@@ -48,6 +47,20 @@ public class UsersService {
 			return response = "Failed";
 		}
 
+	}
+	
+	public String updateUser(Users user) throws ParseException {
+		String result="";
+		Users fetchUser=findUsers(user.getMobileNumber()).get(0);
+		user.setPassword(fetchUser.getPassword());
+		user.setUserTypeId(fetchUser.getUserTypeId());
+		
+		user.setCreateDate(getDateWithoutTimeUsingFormat());
+		if (userRepository.save(user) != null) {
+			return result = "Success";
+		} else {
+			return result = "Failed";
+		}
 	}
 
 	

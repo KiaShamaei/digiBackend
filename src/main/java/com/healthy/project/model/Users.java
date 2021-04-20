@@ -31,12 +31,17 @@ public class Users {
 	private String Password;
 	private Date CreateDate ; 
 	private Boolean IsActive;
+	@Column(  columnDefinition = "nvarchar (3000)")
+	private String Bio;
+	@Column(columnDefinition = "nvarchar (255)")
+	private String Gender;
+	@Column(  columnDefinition = "nvarchar (1000)")
+	private String ImageUrl;
 	@Column( nullable = true)
 	private int UserTypeId;
-	
 	public Users(Long userId, String name, String family, String mobileNumber, String email, String password,
-			Date createDate, Boolean isActive, int userTypeId) {
-		super();
+			Date createDate, Boolean isActive, String bio, String gender, String imageUrl, int userTypeId) {
+		
 		this.userId = userId;
 		Name = name;
 		Family = family;
@@ -45,13 +50,22 @@ public class Users {
 		Password = password;
 		CreateDate = createDate;
 		IsActive = isActive;
+		Bio = bio;
+		Gender = gender;
+		ImageUrl = imageUrl;
 		UserTypeId = userTypeId;
 	}
 	public Users() {
-		super();
+		
 		// TODO Auto-generated constructor stub
 	}
-	
+	@Override
+	public String toString() {
+		return "Users [userId=" + userId + ", Name=" + Name + ", Family=" + Family + ", MobileNumber=" + MobileNumber
+				+ ", Email=" + Email + ", Password=" + Password + ", CreateDate=" + CreateDate + ", IsActive="
+				+ IsActive + ", Bio=" + Bio + ", Gender=" + Gender + ", ImageUrl=" + ImageUrl + ", UserTypeId="
+				+ UserTypeId + "]";
+	}
 	public Long getUserId() {
 		return userId;
 	}
@@ -100,18 +114,34 @@ public class Users {
 	public void setIsActive(Boolean isActive) {
 		IsActive = isActive;
 	}
+	public String getBio() {
+		return Bio;
+	}
+	public void setBio(String bio) {
+		Bio = bio;
+	}
+	public String getGender() {
+		return Gender;
+	}
+	public void setGender(String gender) {
+		Gender = gender;
+	}
+	public String getImageUrl() {
+		return ImageUrl;
+	}
+	public void setImageUrl(String imageUrl) {
+		ImageUrl = imageUrl;
+	}
 	public int getUserTypeId() {
 		return UserTypeId;
 	}
 	public void setUserTypeId(int userTypeId) {
 		UserTypeId = userTypeId;
 	}
-	@Override
-	public String toString() {
-		return "Users [userId=" + userId + ", Name=" + Name + ", Family=" + Family + ", MobileNumber=" + MobileNumber
-				+ ", Email=" + Email + ", Password=" + Password + ", CreateDate=" + CreateDate + ", IsActive="
-				+ IsActive + ", UserTypeId=" + UserTypeId + "]";
-	}
+	
+	
+	
+	
 	
 	
 	

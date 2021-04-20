@@ -1,6 +1,7 @@
 package com.healthy.project.controller;
 
 import java.text.ParseException;
+import java.util.List;
 
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,5 +38,17 @@ UsersService usersService;
  public Users getUsers (@RequestBody UserInfo userInfo) {
 	 return usersService.findUsers(userInfo.getUserInfo()).get(0);
  }
+ @CrossOrigin(origins = "http://localhost:3000")
+ @GetMapping("/userinfo/getuser")
+ public Users getUsers(@RequestParam(value = "mobileNumber") String mobileNumber) {
+	 return usersService.findUsers(mobileNumber).get(0);
+ }
+ 
+ @CrossOrigin(origins = "http://localhost:3000")
+ @PostMapping("userinfo/updateuser")
+ public String updateUser (@RequestBody Users user) throws ParseException {
+	 return usersService.updateUser(user);
+ }
+ 
 
 }
